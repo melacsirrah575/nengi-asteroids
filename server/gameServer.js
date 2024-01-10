@@ -6,6 +6,15 @@ import PlayerCharacter from '../common/PlayerCharacter.js'
 import Identity from '../common/Identity.js'
 import asteroidSystem from './asteroidSystem.js'
 
+const checkCollision = (entityA, entityB) => {
+    return (
+        entityA.x < entityB.x + entityB.width &&
+        entityA.x + entityA.width > entityB.x &&
+        entityA.y < entityB.y + entityB.height &&
+        entityA.y + entityA.height > entityB.y
+    );
+};
+
 const instance = new nengi.Instance(nengiConfig, { port: 8079 })
 instanceHookAPI(instance)
 
@@ -53,6 +62,17 @@ instance.on('command::PlayerInput', ({ command, client }) => {
         entity.x += speed * delta
     }
     entity.rotation = rotation
+
+     // Check for collisions with other players
+    instance.clients.forEach(otherClient => {
+        if (otherClient !== client) {
+            const otherEntity = otherClient.entity;
+            if (checkCollision(entity, otherEntity)) {
+                console.log(`Collision between ${client.entity.nid} and ${otherClient.entity.nid}`);
+                // Handle collision logic here
+            }
+        }
+    })
 })
 
 const update = (delta, tick, now) => {
