@@ -5,6 +5,7 @@ import createHooks from './hooks/createHooks.js'
 import renderer from './graphics/renderer.js'
 import { frameState, releaseKeys, currentState } from './input.js'
 import PlayerInput from '../common/PlayerInput.js'
+import SpeedUpCommand from '../common/SpeedUpCommand.js'
 
 const client = new nengi.Client(nengiConfig, 100)
 
@@ -36,13 +37,18 @@ const update = (delta, tick, now) => {
 
     /* clientside logic can go here */
     if (state.myEntity) {
-        const { up, down, left, right } = frameState
+        const { up, down, left, right, speedUp } = frameState
         const { mouseX, mouseY } = currentState
         const worldCoords = renderer.toWorldCoordinates(mouseX, mouseY)
         const dx = worldCoords.x - state.myEntity.x
         const dy = worldCoords.y - state.myEntity.y
         const rotation = Math.atan2(dy, dx)
         client.addCommand(new PlayerInput(up, down, left, right, rotation, delta))
+
+        if (speedUp) {
+            client.addCommand(new SpeedUpCommand())
+        }
+
         renderer.centerCamera(state.myEntity)
     }
 

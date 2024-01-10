@@ -17,7 +17,7 @@ PlayerInput.protocol = {
     left: nengi.Boolean,
     right: nengi.Boolean,
     rotation: nengi.Float32,
-    delta: nengi.Number
+    delta: nengi.Number,
 }
 
 export default PlayerInput

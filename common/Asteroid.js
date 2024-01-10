@@ -9,8 +9,8 @@ class Asteroid {
             x: 0,
             y: 0
         }
-        this.width = 10
-        this.height = 10
+        this.width = 30
+        this.height = 30
         this.collider = {
             type: 'rectangle',
             width: this.width,

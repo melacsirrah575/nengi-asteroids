@@ -4,6 +4,7 @@ import PlayerCharacter from './PlayerCharacter.js'
 import Asteroid from './Asteroid.js'
 import PlayerInput from './PlayerInput.js'
 import Identity from './Identity.js'
+import SpeedUpCommand from './SpeedUpCommand.js'
 
 const config = {
     UPDATE_RATE: 20, 
@@ -28,7 +29,8 @@ const config = {
             ['Identity', Identity]
         ],
         commands: [
-            ['PlayerInput', PlayerInput]
+            ['PlayerInput', PlayerInput],
+            ['SpeedUpCommand', SpeedUpCommand]
         ],
         basics: []
     }

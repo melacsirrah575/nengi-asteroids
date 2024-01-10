@@ -5,13 +5,20 @@ class PlayerCharacter {
         this.x = 50;
         this.y = 50;
         this.rotation = 0;
-        this.width = 100;
-        this.height = 100;
+        //Height and Width are still acting really weird and idk why...
+        //BUT! The numbers I have here in addition to scale adjustment in Player.js
+        //(I know, I know, you said to keep that scale 1x1)
+        //Seems to be giving me good sized ships with accurate colliders
+        this.width = 50;
+        this.height = 50;
+        this.cwidth = 30;
+        this.cheight = 30;
         this.collider = {
             type: 'rectangle',
-            width: this.width,
-            height: this.height
+            width: this.cwidth,
+            height: this.cheight
         };
+        this.speedMultiplier = 1;
     }
 }
 
@@ -19,8 +26,9 @@ PlayerCharacter.protocol = {
     x: { type: nengi.Number, interp: true },
     y: { type: nengi.Number, interp: true },
     rotation: { type: nengi.RotationFloat32, interp: true },
-    width: { type: nengi.Number, interp: false },
-    height: { type: nengi.Number, interp: false }
+    cwidth: { type: nengi.Number, interp: false },
+    cheight: { type: nengi.Number, interp: false },
+    speedMultiplier: { type: nengi.Number, interp: false }
 };
 
 export default PlayerCharacter;
