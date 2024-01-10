@@ -5,6 +5,7 @@ export default (state) => {
     return {
         create({ data, entity }) {
             const graphics = new Player()
+
             renderer.middleground.addChild(graphics)
             if (state.myId === entity.nid) {
                 state.myEntity = entity
