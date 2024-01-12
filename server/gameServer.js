@@ -29,7 +29,6 @@ instance.on('connect', ({ client, callback }) => {
     instance.message(new NetLog('hello world'), client)
     const entity = new PlayerCharacter()
     instance.addEntity(entity)
-    console.log("height: ", entity.height, "width: ", entity.width)
     instance.message(new Identity(entity.nid), client)
     entities.set(entity.nid, entity)
     client.entity = entity
@@ -51,7 +50,6 @@ instance.on('command::PlayerInput', ({ command, client }) => {
     const { up, down, left, right, rotation, delta } = command
     const { entity } = client
     const speed = 200 * client.entity.speedMultiplier
-    console.log("PlayerSpeed: ", speed)
     if (up) {
         entity.y -= speed * delta
     }
@@ -81,26 +79,38 @@ instance.on('command::PlayerInput', ({ command, client }) => {
 })
 
 instance.on('command::SpeedUpCommand', ({ command, client }) => {
-    console.log("SpeedUpCommand found!")
-    if (!client.speedUpCooldown) {
-        // Apply the speed-up effect (increase speed by 2x)
+    if (client.entity.speedUpCooldownTimer <= 0) {
         const speedMultiplier = 2;
         client.entity.speedMultiplier = speedMultiplier;
-        console.log("Speed Multiplier: ", speedMultiplier)
 
-        // Set a cooldown for the specified duration
-        client.speedUpCooldown = true;
-        setTimeout(() => {
-            client.entity.speedMultiplier = 1;
-            console.log("Speed Multiplier: ", speedMultiplier)
-
-            // Set a cooldown for the specified cooldown time
-            setTimeout(() => {
-                client.speedUpCooldown = false;
-            }, command.cooldown);
-        }, command.duration);
+        //Set Timers for decrementation
+        client.entity.speedUpDurationTimer = client.entity.speedUpDuration;
+        client.entity.speedUpCooldownTimer = client.entity.speedUpCooldown;
     }
 });
+
+const updateTimers = (delta) => {
+    instance.clients.forEach(client => {
+        if (client.entity.speedUpDurationTimer > 0) {
+            client.entity.speedUpDurationTimer -= delta;
+            //console.log("Duration: ", client.entity.speedUpDurationTimer)
+
+            if (client.entity.speedUpDurationTimer <= 0) {
+                client.entity.speedMultiplier = 1;
+                client.entity.speedUpDurationTimer = 0 // in case we go below
+            }
+        }
+
+        if (client.entity.speedUpCooldownTimer > 0 && client.entity.speedUpDurationTimer <= 0) {
+            client.entity.speedUpCooldownTimer -= delta;
+            //console.log("Cooldown: ", client.entity.speedUpCooldownTimer)
+
+            if (client.entity.speedUpCooldownTimer <= 0) {
+                client.entity.speedUpCooldownTimer = 0
+            }
+        }
+    })
+}
 
 const update = (delta, tick, now) => {
     instance.emitCommands()
@@ -110,6 +120,7 @@ const update = (delta, tick, now) => {
         client.view.y = client.entity.y
     })
     asteroidSystem.update(delta)
+    updateTimers(delta)
     instance.update()
 }
 

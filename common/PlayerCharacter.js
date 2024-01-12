@@ -19,6 +19,10 @@ class PlayerCharacter {
             height: this.cheight
         };
         this.speedMultiplier = 1;
+        this.speedUpDuration = 3;
+        this.speedUpCooldown = 5;
+        this.speedUpDurationTimer = 0;
+        this.speedUpCooldownTimer = 0;
     }
 }
 
@@ -28,7 +32,9 @@ PlayerCharacter.protocol = {
     rotation: { type: nengi.RotationFloat32, interp: true },
     cwidth: { type: nengi.Number, interp: false },
     cheight: { type: nengi.Number, interp: false },
-    speedMultiplier: { type: nengi.Number, interp: false }
+    speedMultiplier: { type: nengi.Number, interp: false },
+    speedUpDurationTimer: { type: nengi.Number, interp: false },
+    speedUpCooldownTimer: { type: nengi.Number, interp: false },
 };
 
 export default PlayerCharacter;
