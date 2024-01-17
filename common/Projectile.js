@@ -16,6 +16,8 @@ class Projectile {
             width: this.width,
             height: this.height
         };
+
+        this.lifetime = 3
     }
 }
 
@@ -24,7 +26,8 @@ Projectile.protocol = {
     y: { type: nengi.Number, interp: true },
     rotation: { type: nengi.RotationFloat32, interp: true },
     width: { type: nengi.Number, interp: false },
-    height: { type: nengi.Number, interp: false }
+    height: { type: nengi.Number, interp: false },
+    lifetime: {type: nengi.Number, interp: false}
 }
 
 export default Projectile

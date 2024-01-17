@@ -65,10 +65,12 @@ instance.on('command::PlayerInput', ({ command, client }) => {
         entity.x += speed * delta
     }
 
-    if (fire) {
+    if (fire && client.entity.projectileTimer <= 0) {
+        client.entity.projectileTimer = 2; //TODO: Circle back and make this not a magic number
         const projectile = new Projectile(entity.x, entity.y,);
         instance.addEntity(projectile)
         projectiles.set(projectile.nid, projectile)
+        client.projectile = projectile
     }
     entity.rotation = rotation
 
@@ -80,7 +82,7 @@ instance.on('command::PlayerInput', ({ command, client }) => {
                 console.log(`Collision between ${client.entity.nid} and ${otherClient.entity.nid}`);
                 // Handle collision logic here
             } else {
-                console.log("No collision")
+                //console.log("No collision")
             }
         }
     })
@@ -116,6 +118,30 @@ const updateTimers = (delta) => {
             if (client.entity.speedUpCooldownTimer <= 0) {
                 client.entity.speedUpCooldownTimer = 0
             }
+        }
+
+        if (client.entity.projectileTimer > 0) {
+            client.entity.projectileTimer -= delta
+
+            if (client.entity.projectileTimer < 0) {
+                
+                client.entity.projectileTimer = 0
+            }
+        }
+    })
+    
+    //console.log("Projectiles size: ", projectiles.size)
+    projectiles.forEach(projectile => {
+        if (projectile.lifetime > 0) {
+            projectile.lifetime -= delta
+            //console.log("Projectile lifetime: ", projectile.lifetime)
+        }
+
+        if (projectile.lifetime <= 0) {
+            projectile.lifetime = 0;
+            projectiles.delete(projectile.nid)
+            instance.removeEntity(projectile)
+            //console.log("Projectiles size: ", projectiles.size)
         }
     })
 }
