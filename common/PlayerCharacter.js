@@ -23,6 +23,8 @@ class PlayerCharacter {
         this.speedUpCooldown = 5;
         this.speedUpDurationTimer = 0;
         this.speedUpCooldownTimer = 0;
+
+        this.projectileTimer = 0;
     }
 }
 
@@ -35,6 +37,7 @@ PlayerCharacter.protocol = {
     speedMultiplier: { type: nengi.Number, interp: false },
     speedUpDurationTimer: { type: nengi.Number, interp: false },
     speedUpCooldownTimer: { type: nengi.Number, interp: false },
+    projectileTimer: { type: nengi.Number, interp: false }
 };
 
 export default PlayerCharacter;

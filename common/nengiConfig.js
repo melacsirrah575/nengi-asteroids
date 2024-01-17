@@ -5,6 +5,7 @@ import Asteroid from './Asteroid.js'
 import PlayerInput from './PlayerInput.js'
 import Identity from './Identity.js'
 import SpeedUpCommand from './SpeedUpCommand.js'
+import Projectile from './Projectile.js'
 
 const config = {
     UPDATE_RATE: 20, 
@@ -21,7 +22,8 @@ const config = {
     protocols: {
         entities: [
             ['PlayerCharacter', PlayerCharacter],
-            ['Asteroid', Asteroid]
+            ['Asteroid', Asteroid],
+            ['Projectile', Projectile]
         ],
         localMessages: [],
         messages: [

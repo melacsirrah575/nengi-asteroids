@@ -7,7 +7,8 @@ const currentState = {
     mouseX: 0,
     mouseY: 0,
     mouseDown: false,
-    speedUp: false
+    speedUp: false,
+    fire: false
 }
 
 // keys that count as pressed for this frame
@@ -17,7 +18,8 @@ const frameState = {
     left: false,
     right: false,
     mouseDown: false,
-    speedUp: false
+    speedUp: false,
+    fire: false
 }
 
 // call this once per frame so that the above ^ is accurate
@@ -28,6 +30,7 @@ const releaseKeys = () => {
     frameState.right = currentState.right
     frameState.mouseDown = currentState.mouseDown
     frameState.speedUp = currentState.speedUp
+    frameState.fire = currentState.fire
 }
 
 document.addEventListener('contextmenu', event =>
@@ -60,11 +63,15 @@ document.addEventListener('keydown', event => {
 
     // Q key
     if (event.keyCode === 81) {
-        // Set a flag in frameState indicating that the 'Q' key is pressed
         currentState.speedUp = true
         frameState.speedUp = true;
-        console.log("Q was pressed");
     }
+
+        // Space key
+        if (event.keyCode === 32) {
+            currentState.fire = true
+            frameState.fire = true;
+        }
 })
 
 document.addEventListener('keyup', event => {
@@ -84,10 +91,12 @@ document.addEventListener('keyup', event => {
 
     // Q key
     if (event.keyCode === 81) {
-        // Set a flag in frameState indicating that the 'Q' key is pressed
         currentState.speedUp = false
-        frameState.speedUp = false;
-        console.log("Q was released");
+    }
+
+    // Space key
+    if (event.keyCode === 32) {
+        currentState.fire = false
     }
 })
 
