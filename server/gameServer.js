@@ -6,6 +6,7 @@ import PlayerCharacter from '../common/PlayerCharacter.js'
 import Identity from '../common/Identity.js'
 import asteroidSystem from './asteroidSystem.js'
 import SpeedUpCommand from '../common/SpeedUpCommand.js'
+import Projectile from '../common/Projectile.js'
 
 const checkCollision = (entityA, entityB) => {
     return (
@@ -21,6 +22,7 @@ instanceHookAPI(instance)
 
 /* serverside state here */
 const entities = new Map()
+const projectiles = new Map()
 asteroidSystem.populate(instance, 10)
 
 instance.on('connect', ({ client, callback }) => {
@@ -47,7 +49,7 @@ instance.on('disconnect', client => {
 
 /* on('command::AnyCommand', ({ command, client }) => { }) */
 instance.on('command::PlayerInput', ({ command, client }) => {
-    const { up, down, left, right, rotation, delta } = command
+    const { up, down, left, right, rotation, delta, fire } = command
     const { entity } = client
     const speed = 200 * client.entity.speedMultiplier
     if (up) {
@@ -61,6 +63,12 @@ instance.on('command::PlayerInput', ({ command, client }) => {
     }
     if (right) {
         entity.x += speed * delta
+    }
+
+    if (fire) {
+        const projectile = new Projectile(entity.x, entity.y,);
+        instance.addEntity(projectile)
+        projectiles.set(projectile.nid, projectile)
     }
     entity.rotation = rotation
 

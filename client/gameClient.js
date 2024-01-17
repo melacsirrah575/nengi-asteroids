@@ -37,13 +37,13 @@ const update = (delta, tick, now) => {
 
     /* clientside logic can go here */
     if (state.myEntity) {
-        const { up, down, left, right, speedUp } = frameState
+        const { up, down, left, right, speedUp, fire } = frameState
         const { mouseX, mouseY } = currentState
         const worldCoords = renderer.toWorldCoordinates(mouseX, mouseY)
         const dx = worldCoords.x - state.myEntity.x
         const dy = worldCoords.y - state.myEntity.y
         const rotation = Math.atan2(dy, dx)
-        client.addCommand(new PlayerInput(up, down, left, right, rotation, delta))
+        client.addCommand(new PlayerInput(up, down, left, right, rotation, delta, fire))
 
         if (speedUp) {
             client.addCommand(new SpeedUpCommand())
