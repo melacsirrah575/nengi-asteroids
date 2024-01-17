@@ -65,25 +65,28 @@ instance.on('command::PlayerInput', ({ command, client }) => {
         entity.x += speed * delta
     }
 
+    entity.rotation = rotation
+
+    //console.log("Fire: ", fire, " ProjectileTimer: ", client.entity.projectileTimer)
     if (fire && client.entity.projectileTimer <= 0) {
-        client.entity.projectileTimer = 2; //TODO: Circle back and make this not a magic number
-        const projectile = new Projectile(entity.x, entity.y,);
+        client.entity.projectileTimer = 0.5; //TODO: Circle back and make this not a magic number
+        const projectile = new Projectile(entity.x, entity.y, entity.rotation);
         instance.addEntity(projectile)
         projectiles.set(projectile.nid, projectile)
         client.projectile = projectile
     }
-    entity.rotation = rotation
 
      // Check for collisions with other players
     instance.clients.forEach(otherClient => {
         if (otherClient !== client) {
+            //Client - Client collision
             const otherEntity = otherClient.entity;
             if (checkCollision(entity, otherEntity)) {
                 console.log(`Collision between ${client.entity.nid} and ${otherClient.entity.nid}`);
                 // Handle collision logic here
-            } else {
-                //console.log("No collision")
             }
+
+
         }
     })
 })
@@ -122,11 +125,9 @@ const updateTimers = (delta) => {
 
         if (client.entity.projectileTimer > 0) {
             client.entity.projectileTimer -= delta
-
-            if (client.entity.projectileTimer < 0) {
-                
-                client.entity.projectileTimer = 0
-            }
+        }
+        if (client.entity.projectileTimer < 0) {
+            client.entity.projectileTimer = 0
         }
     })
     
@@ -136,6 +137,13 @@ const updateTimers = (delta) => {
             projectile.lifetime -= delta
             //console.log("Projectile lifetime: ", projectile.lifetime)
         }
+
+        const angle = projectile.rotation
+        const deltaX = projectile.speed * Math.cos(angle) * delta
+        const deltaY = projectile.speed * Math.sin(angle) * delta
+
+        projectile.x += deltaX
+        projectile.y += deltaY
 
         if (projectile.lifetime <= 0) {
             projectile.lifetime = 0;
