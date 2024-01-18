@@ -32,5 +32,6 @@ const update = (delta) => {
 
 export default {
     populate,
-    update
+    update,
+    asteroids
 }
