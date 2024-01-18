@@ -1,7 +1,7 @@
 import nengi from "nengi";
 
 class Projectile {
-    constructor(x, y, rotation, owner) {
+    constructor(x, y, rotation, ownerID) {
         this.x = x
         this.y = y
         this.rotation = rotation
@@ -18,8 +18,8 @@ class Projectile {
             height: this.height
         };
 
-        this.lifetime = 3
-        this.owner = owner
+        this.lifetimeInSeconds = 3
+        this.ownerID = ownerID
     }
 }
 
@@ -27,11 +27,11 @@ Projectile.protocol = {
     x: { type: nengi.Number, interp: true },
     y: { type: nengi.Number, interp: true },
     rotation: { type: nengi.RotationFloat32, interp: true },
-    speed: {type: nengi.Number, interp: false },
     width: { type: nengi.Number, interp: false },
     height: { type: nengi.Number, interp: false },
-    lifetime: {type: nengi.Number, interp: false},
-    owner: {type: nengi.Number, interp: false }
+    //OwnerID could be used for things like changing color of bullets depending on if the bullet is safe
+    //For the specific client or not. Could also be used for a Hellish Rebuke mechanic
+    ownerID: {type: nengi.Number, interp: false }
 }
 
 export default Projectile
