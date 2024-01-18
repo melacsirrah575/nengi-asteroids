@@ -4,6 +4,7 @@ class PlayerCharacter {
     constructor() {
         this.x = 50;
         this.y = 50;
+        this.health = 3;
         this.rotation = 0;
         //Height and Width are still acting really weird and idk why...
         //BUT! The numbers I have here in addition to scale adjustment in Player.js
@@ -31,6 +32,7 @@ class PlayerCharacter {
 PlayerCharacter.protocol = {
     x: { type: nengi.Number, interp: true },
     y: { type: nengi.Number, interp: true },
+    health: {type: nengi.Number, interp: false },
     rotation: { type: nengi.RotationFloat32, interp: true },
     cwidth: { type: nengi.Number, interp: false },
     cheight: { type: nengi.Number, interp: false },

@@ -70,10 +70,11 @@ instance.on('command::PlayerInput', ({ command, client }) => {
     //console.log("Fire: ", fire, " ProjectileTimer: ", client.entity.projectileTimer)
     if (fire && client.entity.projectileTimer <= 0) {
         client.entity.projectileTimer = 0.5; //TODO: Circle back and make this not a magic number
-        const projectile = new Projectile(entity.x, entity.y, entity.rotation);
+        const projectile = new Projectile(entity.x, entity.y, entity.rotation, entity.nid);
         instance.addEntity(projectile)
         projectiles.set(projectile.nid, projectile)
         client.projectile = projectile
+        console.log("Projectile Owner: ", projectile.owner)
     }
 
      // Check for collisions with other players
@@ -85,8 +86,24 @@ instance.on('command::PlayerInput', ({ command, client }) => {
                 console.log(`Collision between ${client.entity.nid} and ${otherClient.entity.nid}`);
                 // Handle collision logic here
             }
+        }
+    })
 
+    projectiles.forEach(projectile => {
+        if (projectile.owner !== client.entity.nid) {
+            if (checkCollision(client.entity, projectile)) {
+                console.log(`Collision between ${projectile.nid} and ${entity.nid}`);
+                client.entity.health -= 1
+                projectiles.delete(projectile.nid)
+                instance.removeEntity(projectile)
 
+                console.log(client.entity.nid, " HP = ", client.entity.health)
+
+                if (client.entity.health <= 0) {
+                    console.log("Player: ", client.entity.nid, " should be ded")
+                    instance.message(new NetLog("You died"), client)
+                }
+            }
         }
     })
 })
