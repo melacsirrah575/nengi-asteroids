@@ -70,14 +70,14 @@ instance.on('command::PlayerInput', ({ command, client }) => {
     //console.log("Fire: ", fire, " ProjectileTimer: ", client.entity.projectileTimer)
     if (fire && client.entity.projectileTimer <= 0) {
         client.entity.projectileTimer = 0.5; //TODO: Circle back and make this not a magic number
-        const projectile = new Projectile(entity.x, entity.y, entity.rotation, entity.nid);
+        const projectile = new Projectile(entity.x, entity.y, entity.rotation, entity.nid, entity.speedMultiplier);
         instance.addEntity(projectile)
         projectiles.set(projectile.nid, projectile)
         client.projectile = projectile
         console.log("Projectile OwnerID: ", projectile.ownerID)
     }
 
-     // Check for collisions with other players
+    //Collision Checks
     instance.clients.forEach(otherClient => {
         if (otherClient !== client) {
             //Client - Client collision
@@ -105,6 +105,20 @@ instance.on('command::PlayerInput', ({ command, client }) => {
                 }
             }
         }
+
+        asteroidSystem.asteroids.forEach(asteroid => {
+            if (checkCollision(projectile, asteroid)) {
+                console.log(`Collision between ${projectile.nid} and ${asteroid.nid}`);
+                //DESTROY ASTEROID AND GIVE PLAYER SCORE
+            }
+        })
+    })
+
+    asteroidSystem.asteroids.forEach(asteroid => {
+        if (checkCollision(client.entity, asteroid)) {
+            console.log(`Collision between ${client.entity.nid} and ${asteroid.nid}`);
+            //DESTROY ASTEROID, REMOVE 1 LIFE FROM PLAYER, AND REDUCE SCORE
+        }
     })
 })
 
@@ -118,6 +132,7 @@ instance.on('command::SpeedUpCommand', ({ command, client }) => {
         client.entity.speedUpCooldownTimer = client.entity.speedUpCooldown;
     }
 });
+
 
 const updateTimers = (delta) => {
     instance.clients.forEach(client => {

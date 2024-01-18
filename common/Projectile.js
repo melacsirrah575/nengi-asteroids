@@ -1,11 +1,11 @@
 import nengi from "nengi";
 
 class Projectile {
-    constructor(x, y, rotation, ownerID) {
+    constructor(x, y, rotation, ownerID, speedMultiplier) {
         this.x = x
         this.y = y
         this.rotation = rotation
-        this.speed = 100
+        this.speed = 300 * speedMultiplier
         this.velocity = {
             x: 0,
             y: 0
