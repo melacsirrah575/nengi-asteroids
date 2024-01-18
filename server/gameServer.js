@@ -90,10 +90,19 @@ instance.on('command::PlayerInput', ({ command, client }) => {
     })
 
     projectiles.forEach(projectile => {
-        if (projectile.owner !== entity.nid) {
-            if (checkCollision(entity, projectile)) {
+        if (projectile.owner !== client.entity.nid) {
+            if (checkCollision(client.entity, projectile)) {
                 console.log(`Collision between ${projectile.nid} and ${entity.nid}`);
+                client.entity.health -= 1
+                projectiles.delete(projectile.nid)
+                instance.removeEntity(projectile)
 
+                console.log(client.entity.nid, " HP = ", client.entity.health)
+
+                if (client.entity.health <= 0) {
+                    console.log("Player: ", client.entity.nid, " should be ded")
+                    instance.message(new NetLog("You died"), client)
+                }
             }
         }
     })
