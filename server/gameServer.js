@@ -74,7 +74,7 @@ instance.on('command::PlayerInput', ({ command, client }) => {
         instance.addEntity(projectile)
         projectiles.set(projectile.nid, projectile)
         client.projectile = projectile
-        console.log("Projectile Owner: ", projectile.owner)
+        console.log("Projectile OwnerID: ", projectile.ownerID)
     }
 
      // Check for collisions with other players
@@ -90,7 +90,7 @@ instance.on('command::PlayerInput', ({ command, client }) => {
     })
 
     projectiles.forEach(projectile => {
-        if (projectile.owner !== client.entity.nid) {
+        if (projectile.ownerID !== client.entity.nid) {
             if (checkCollision(client.entity, projectile)) {
                 console.log(`Collision between ${projectile.nid} and ${entity.nid}`);
                 client.entity.health -= 1
@@ -150,9 +150,9 @@ const updateTimers = (delta) => {
     
     //console.log("Projectiles size: ", projectiles.size)
     projectiles.forEach(projectile => {
-        if (projectile.lifetime > 0) {
-            projectile.lifetime -= delta
-            //console.log("Projectile lifetime: ", projectile.lifetime)
+        if (projectile.lifetimeInSeconds > 0) {
+            projectile.lifetimeInSeconds -= delta
+            //console.log("Projectile lifetimeInSeconds: ", projectile.lifetimeInSeconds)
         }
 
         const angle = projectile.rotation
@@ -162,8 +162,8 @@ const updateTimers = (delta) => {
         projectile.x += deltaX
         projectile.y += deltaY
 
-        if (projectile.lifetime <= 0) {
-            projectile.lifetime = 0;
+        if (projectile.lifetimeInSeconds <= 0) {
+            projectile.lifetimeInSeconds = 0;
             projectiles.delete(projectile.nid)
             instance.removeEntity(projectile)
             //console.log("Projectiles size: ", projectiles.size)
