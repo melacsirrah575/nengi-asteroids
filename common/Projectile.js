@@ -1,7 +1,7 @@
 import nengi from "nengi";
 
 class Projectile {
-    constructor(x, y, rotation) {
+    constructor(x, y, rotation, owner) {
         this.x = x
         this.y = y
         this.rotation = rotation
@@ -19,6 +19,7 @@ class Projectile {
         };
 
         this.lifetime = 3
+        this.owner = owner
     }
 }
 
@@ -29,7 +30,8 @@ Projectile.protocol = {
     speed: {type: nengi.Number, interp: false },
     width: { type: nengi.Number, interp: false },
     height: { type: nengi.Number, interp: false },
-    lifetime: {type: nengi.Number, interp: false}
+    lifetime: {type: nengi.Number, interp: false},
+    owner: {type: nengi.Number, interp: false }
 }
 
 export default Projectile
