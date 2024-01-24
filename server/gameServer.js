@@ -7,6 +7,7 @@ import Identity from '../common/Identity.js'
 import asteroidSystem from './asteroidSystem.js'
 import SpeedUpCommand from '../common/SpeedUpCommand.js'
 import Projectile from '../common/Projectile.js'
+import LeaderboardUpdate from '../common/LeaderboardUpdate.js'
 
 const checkCollision = (entityA, entityB) => {
     return (
@@ -23,6 +24,8 @@ instanceHookAPI(instance)
 /* serverside state here */
 const entities = new Map()
 const projectiles = new Map()
+const scores = new Map()
+
 asteroidSystem.populate(instance, 10)
 
 instance.on('connect', ({ client, callback }) => {
@@ -43,6 +46,8 @@ instance.on('connect', ({ client, callback }) => {
 })
 
 instance.on('disconnect', client => {
+    scores.delete(client.entity.nid);
+    updateLeaderboard(client);
     entities.delete(client.entity.nid)
     instance.removeEntity(client.entity)
 })
@@ -101,6 +106,12 @@ instance.on('command::PlayerInput', ({ command, client }) => {
 
                 if (client.entity.health <= 0) {
                     console.log("Player: ", client.entity.nid, " should be ded")
+                    
+                    client.entity.score += 1;
+                    const newScore = client.entity.score
+
+                    updatePlayerScore(client.entity.nid, newScore, client);
+
                     instance.message(new NetLog("You died"), client)
                 }
             }
@@ -133,6 +144,25 @@ instance.on('command::SpeedUpCommand', ({ command, client }) => {
     }
 });
 
+const updateLeaderboard = (client) => {
+    const leaderboardData = Array.from(scores.entries())
+        .map(([playerId, score]) => ({ playerId, score }))
+        .sort((a, b) => b.score - a.score);
+
+    console.log("LeaderboardData: ", leaderboardData)
+    const leaderboardMessage = new LeaderboardUpdate(leaderboardData);
+    console.log(leaderboardMessage);
+    
+    //console.log("Instance: ", instance.clients)
+    //console.log("Client: ", client)
+    
+    instance.message(leaderboardMessage, client);
+};
+
+const updatePlayerScore = (playerId, newScore, client) => {
+    scores.set(playerId, newScore);
+    updateLeaderboard(client);
+};
 
 const updateTimers = (delta) => {
     instance.clients.forEach(client => {

@@ -1,13 +1,30 @@
-<!doctype html>
-
-<html lang='en'>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <title>nengi demo</title>
-    <meta name='description' content='nengi 2d csp demo'>
-    <link rel='stylesheet' href='css/styles-v0.0.1.css'>
+    <meta name="description" content="nengi 2d csp demo">
+    <link rel="stylesheet" href="css/styles-v0.0.1.css">
+    <style>
+        /* Add some basic styling for the leaderboard */
+        #leaderboard {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
 <body>
-    <script src='js/app-v0.0.1.js'></script>
-    <canvas id='main-canvas'></canvas>
+    <!-- Your game canvas or other elements -->
+    <canvas id="main-canvas"></canvas>
+
+    <!-- Leaderboard element -->
+    <div id="leaderboard"></div>
+
+    <script src="js/app-v0.0.1.js"></script>
 </body>
 </html>

@@ -12,7 +12,8 @@ const client = new nengi.Client(nengiConfig, 100)
 const state = {
     /* clientside state can go here */
     myId: null,
-    myEntity: null
+    myEntity: null,
+    leaderboard: []
 }
 
 /* create hooks for any entity create, delete, and watch properties */
@@ -30,7 +31,16 @@ client.on('message::Identity', message => {
     state.myId = message.entityId
 })
 
+client.on('message::leaderboardUpdate', message => {
+    state.leaderboard = message.data;
+    updateLeaderboardUI();
+});
+
 client.connect('ws://localhost:8079')
+
+const updateLeaderboardUI = () => {
+    // Your logic to update the UI with state.leaderboard
+};
 
 const update = (delta, tick, now) => {
     client.readNetworkAndEmit()
