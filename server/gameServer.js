@@ -33,6 +33,7 @@ instance.on('connect', ({ client, callback }) => {
     instance.addEntity(entity)
     instance.message(new Identity(entity.nid), client)
     entities.set(entity.nid, entity)
+    console.log("Client entity before assigning: ", client.entity)
     client.entity = entity
     client.view = {
         x: entity.x,
@@ -100,8 +101,15 @@ instance.on('command::PlayerInput', ({ command, client }) => {
                 console.log(client.entity.nid, " HP = ", client.entity.health)
 
                 if (client.entity.health <= 0) {
-                    console.log("Player: ", client.entity.nid, " should be ded")
-                    instance.message(new NetLog("You died"), client)
+                    console.log("Player: ", client.entity.nid, " should be ded");
+                    console.log("Entities size: ", entities.size)
+                    if (entities.has(client.entity.nid)) {
+                        instance.message(new NetLog("You died"), client);
+
+                        entities.delete(client.entity.nid);
+                        instance.removeEntity(client.entity);
+                        delete(client.entity)
+                    }
                 }
             }
         }
@@ -115,10 +123,10 @@ instance.on('command::PlayerInput', ({ command, client }) => {
     })
 
     asteroidSystem.asteroids.forEach(asteroid => {
-        if (checkCollision(client.entity, asteroid)) {
-            console.log(`Collision between ${client.entity.nid} and ${asteroid.nid}`);
-            //DESTROY ASTEROID, REMOVE 1 LIFE FROM PLAYER, AND REDUCE SCORE
-        }
+            if (checkCollision(client.entity, asteroid)) {
+                console.log(`Collision between ${client.entity.nid} and ${asteroid.nid}`);
+                //DESTROY ASTEROID, REMOVE 1 LIFE FROM PLAYER, AND REDUCE SCORE
+            }
     })
 })
 

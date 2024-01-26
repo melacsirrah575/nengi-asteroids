@@ -23,7 +23,15 @@ client.on('disconnected', () => { console.log('connection closed') })
 
 /* on('message::AnyMessage', msg => { }) */
 client.on('message::NetLog', message => {
-    console.log(`NetLog: ${ message.text }`)
+    console.log("Recieved Message")
+    if (message.text === "You died") {
+        console.log("Message was You died")
+        const deathMessageElement = document.getElementById('death-message');
+        deathMessageElement.innerText = message.text;
+
+        const deathMessageContainer = document.getElementById('death-message-container');
+        deathMessageContainer.style.display = 'block';
+    }
 })
 
 client.on('message::Identity', message => {
