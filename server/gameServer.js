@@ -109,7 +109,10 @@ instance.on('command::PlayerInput', ({ command, client }) => {
         asteroidSystem.asteroids.forEach(asteroid => {
             if (checkCollision(projectile, asteroid)) {
                 console.log(`Collision between ${projectile.nid} and ${asteroid.nid}`);
-                //DESTROY ASTEROID AND GIVE PLAYER SCORE
+                asteroidSystem.asteroids.delete(asteroid.nid)
+                instance.removeEntity(asteroid)
+                projectiles.delete(projectile.nid)
+                instance.removeEntity(projectile)
             }
         })
     })
