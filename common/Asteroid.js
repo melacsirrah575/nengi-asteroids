@@ -18,6 +18,8 @@ class Asteroid {
             height: this.height
         };
         this.isSmallAsteroid = false;
+        this.bigScore = 20
+        this.smallScore = 10
     }
 }
 
