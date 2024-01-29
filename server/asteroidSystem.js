@@ -7,8 +7,8 @@ const randomWithinRange = (min, max) => {
 
 const asteroids = new Map()
 
-const spawnAsteroid = (instance) => {
-    const asteroid = new Asteroid()
+const spawnAsteroid = (instance, scale) => {
+    const asteroid = new Asteroid(scale)
     asteroid.x = Math.random() * 1000
     asteroid.y = Math.random() * 1000
     asteroid.velocity.x = randomWithinRange(-5, 5)
@@ -17,9 +17,26 @@ const spawnAsteroid = (instance) => {
     asteroids.set(asteroid.nid, asteroid)
 }
 
+const spawnAsteroidAtPosition = (instance, xPos, yPos, scale) => {
+    const asteroid = new Asteroid(scale)
+    asteroid.x = xPos
+    asteroid.y = yPos
+    asteroid.isSmallAsteroid = true
+    asteroid.velocity.x = randomWithinRange(-10, 10)
+    asteroid.velocity.y = randomWithinRange(-10, 10)
+    instance.addEntity(asteroid)
+    asteroids.set(asteroid.nid, asteroid)
+}
+
 const populate = (instance, howManyAsteroids) => {
     for (let i = 0; i < howManyAsteroids; i++) {
-        spawnAsteroid(instance)
+        spawnAsteroid(instance, 1)
+    }
+}
+
+const populateAsteroidsFromDestroyedAsteroid = (instance, howManyAsteroids, xPos, yPos, scale) => {
+    for (let i = 0; i < howManyAsteroids; i++) {
+        spawnAsteroidAtPosition(instance, xPos, yPos, scale)
     }
 }
 
@@ -33,5 +50,6 @@ const update = (delta) => {
 export default {
     populate,
     update,
-    asteroids
+    asteroids,
+    populateAsteroidsFromDestroyedAsteroid
 }
