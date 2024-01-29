@@ -4,7 +4,8 @@ import renderer from '../graphics/renderer.js'
 export default (state) => {
     return {
         create({ data, entity }) {
-            const graphics = new Player()
+            const username = entity.username || ""
+            const graphics = new Player(username)
 
             renderer.middleground.addChild(graphics)
             if (state.myId === entity.nid) {
