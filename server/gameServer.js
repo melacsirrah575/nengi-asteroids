@@ -50,6 +50,9 @@ instance.on('disconnect', client => {
 
 /* on('command::AnyCommand', ({ command, client }) => { }) */
 instance.on('command::PlayerInput', ({ command, client }) => {
+    if (client.entity.isDead) {
+        return
+    }
     const { up, down, left, right, rotation, delta, fire } = command
     const { entity } = client
     const speed = 200 * client.entity.speedMultiplier
@@ -101,6 +104,7 @@ instance.on('command::PlayerInput', ({ command, client }) => {
                 console.log(client.entity.nid, " HP = ", client.entity.health)
 
                 if (client.entity.health <= 0) {
+                    client.entity.isDead = true
                     console.log("Player: ", client.entity.nid, " should be ded");
                     console.log("Entities size: ", entities.size)
                     if (entities.has(client.entity.nid)) {
@@ -108,7 +112,6 @@ instance.on('command::PlayerInput', ({ command, client }) => {
 
                         entities.delete(client.entity.nid);
                         instance.removeEntity(client.entity);
-                        delete(client.entity)
                     }
                 }
             }
