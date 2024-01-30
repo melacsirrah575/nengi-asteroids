@@ -7,6 +7,7 @@ import Identity from '../common/Identity.js'
 import asteroidSystem from './asteroidSystem.js'
 import SpeedUpCommand from '../common/SpeedUpCommand.js'
 import Projectile from '../common/Projectile.js'
+import PlayerDeathMessage from '../common/PlayerDeathMessage.js'
 
 const checkCollision = (entityA, entityB) => {
     return (
@@ -33,7 +34,6 @@ instance.on('connect', ({ client, callback }) => {
     instance.addEntity(entity)
     instance.message(new Identity(entity.nid), client)
     entities.set(entity.nid, entity)
-    console.log("Client entity before assigning: ", client.entity)
     client.entity = entity
     client.view = {
         x: entity.x,
@@ -51,6 +51,8 @@ instance.on('disconnect', client => {
 /* on('command::AnyCommand', ({ command, client }) => { }) */
 instance.on('command::PlayerInput', ({ command, client }) => {
     if (client.entity.isDead) {
+        console.log("SendingDeathMessage")
+        instance.message(new PlayerDeathMessage(client.entity.nid), client);
         return
     }
     const { up, down, left, right, rotation, delta, fire } = command
@@ -78,7 +80,6 @@ instance.on('command::PlayerInput', ({ command, client }) => {
         instance.addEntity(projectile)
         projectiles.set(projectile.nid, projectile)
         client.projectile = projectile
-        console.log("Projectile OwnerID: ", projectile.ownerID)
     }
 
     //Collision Checks
@@ -87,7 +88,7 @@ instance.on('command::PlayerInput', ({ command, client }) => {
             //Client - Client collision
             const otherEntity = otherClient.entity;
             if (checkCollision(entity, otherEntity)) {
-                console.log(`Collision between ${client.entity.nid} and ${otherClient.entity.nid}`);
+                //console.log(`Collision between ${client.entity.nid} and ${otherClient.entity.nid}`);
                 // Handle collision logic here
             }
         }
@@ -96,12 +97,11 @@ instance.on('command::PlayerInput', ({ command, client }) => {
     projectiles.forEach(projectile => {
         if (projectile.ownerID !== client.entity.nid) {
             if (checkCollision(client.entity, projectile)) {
-                console.log(`Collision between ${projectile.nid} and ${entity.nid}`);
+                //console.log(`Collision between ${projectile.nid} and ${entity.nid}`);
                 client.entity.health -= 1
                 projectiles.delete(projectile.nid)
                 instance.removeEntity(projectile)
 
-                console.log(client.entity.nid, " HP = ", client.entity.health)
 
                 if (client.entity.health <= 0) {
                     client.entity.isDead = true
@@ -119,7 +119,7 @@ instance.on('command::PlayerInput', ({ command, client }) => {
 
         asteroidSystem.asteroids.forEach(asteroid => {
             if (checkCollision(projectile, asteroid)) {
-                console.log(`Collision between ${projectile.nid} and ${asteroid.nid}`);
+                //console.log(`Collision between ${projectile.nid} and ${asteroid.nid}`);
                 //DESTROY ASTEROID AND GIVE PLAYER SCORE
             }
         })

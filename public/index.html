@@ -14,10 +14,16 @@
 
         <div id='death-message-container'>
             <p id='death-message'></p>
+            <button id='reload-button'>Play Again</button>
         </div>
     </div>
 
     <script src='js/app-v0.0.1.js'></script>
+    <script>
+        document.getElementById('reload-button').addEventListener('click', function() {
+            location.reload();
+        });
+    </script>
 </body>
 
 </html>

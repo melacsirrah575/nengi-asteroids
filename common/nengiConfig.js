@@ -6,6 +6,7 @@ import PlayerInput from './PlayerInput.js'
 import Identity from './Identity.js'
 import SpeedUpCommand from './SpeedUpCommand.js'
 import Projectile from './Projectile.js'
+import PlayerDeathMessage from './PlayerDeathMessage.js'
 
 const config = {
     UPDATE_RATE: 20, 
@@ -28,7 +29,8 @@ const config = {
         localMessages: [],
         messages: [
             ['NetLog', NetLog],
-            ['Identity', Identity]
+            ['Identity', Identity],
+            ['PlayerDeathMessage', PlayerDeathMessage]
         ],
         commands: [
             ['PlayerInput', PlayerInput],
