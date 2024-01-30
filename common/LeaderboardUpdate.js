@@ -8,7 +8,7 @@ class LeaderboardUpdate {
 
 LeaderboardUpdate.protocol = {
     data: { 
-        playerId: nengi.UInt16, 
+        clientID: nengi.UInt16, 
         score: nengi.UInt16 
     }
 };

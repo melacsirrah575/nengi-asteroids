@@ -39,7 +39,7 @@ client.on('message::leaderboardUpdate', message => {
 client.connect('ws://localhost:8079')
 
 const updateLeaderboardUI = () => {
-    // Your logic to update the UI with state.leaderboard
+    // logic to update the UI with state.leaderboard
 };
 
 const update = (delta, tick, now) => {

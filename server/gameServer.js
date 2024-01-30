@@ -146,12 +146,12 @@ instance.on('command::SpeedUpCommand', ({ command, client }) => {
 
 const updateLeaderboard = (client) => {
     const leaderboardData = Array.from(scores.entries())
-        .map(([playerId, score]) => ({ playerId, score }))
+        .map(([clientID, score]) => ({ clientID, score }))
         .sort((a, b) => b.score - a.score);
 
-    console.log("LeaderboardData: ", leaderboardData)
+    //console.log("LeaderboardData: ", leaderboardData)
     const leaderboardMessage = new LeaderboardUpdate(leaderboardData);
-    console.log(leaderboardMessage);
+    //console.log(leaderboardMessage);
     
     //console.log("Instance: ", instance.clients)
     //console.log("Client: ", client)
@@ -159,8 +159,8 @@ const updateLeaderboard = (client) => {
     instance.message(leaderboardMessage, client);
 };
 
-const updatePlayerScore = (playerId, newScore, client) => {
-    scores.set(playerId, newScore);
+const updatePlayerScore = (clientID, newScore, client) => {
+    scores.set(clientID, newScore);
     updateLeaderboard(client);
 };
 
