@@ -1,16 +1,15 @@
 import nengi from 'nengi';
 
 class LeaderboardUpdate {
-    constructor(data) {
-        this.data = data;
+    constructor(clientID, score) {
+        this.clientID = clientID;
+        this.score = score;
     }
 }
 
 LeaderboardUpdate.protocol = {
-    data: { 
-        clientID: nengi.UInt16, 
-        score: nengi.UInt16 
-    }
+    clientID: nengi.UInt16, 
+    score: nengi.UInt16 
 };
 
 export default LeaderboardUpdate;

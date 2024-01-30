@@ -37,6 +37,9 @@ instance.on('connect', ({ client, callback }) => {
     instance.message(new Identity(entity.nid), client)
     entities.set(entity.nid, entity)
     client.entity = entity
+    if (!scores.has(entity.nid)) {
+        scores.set(entity.nid, entity.score)
+    }
     client.view = {
         x: entity.x,
         y: entity.y,
@@ -102,15 +105,13 @@ instance.on('command::PlayerInput', ({ command, client }) => {
                 projectiles.delete(projectile.nid)
                 instance.removeEntity(projectile)
 
-                console.log(client.entity.nid, " HP = ", client.entity.health)
+                client.entity.score += 10;
+                const newScore = client.entity.score
+
+                updatePlayerScore(client.entity.nid, newScore, client);
 
                 if (client.entity.health <= 0) {
                     console.log("Player: ", client.entity.nid, " should be ded")
-                    
-                    client.entity.score += 1;
-                    const newScore = client.entity.score
-
-                    updatePlayerScore(client.entity.nid, newScore, client);
 
                     instance.message(new NetLog("You died"), client)
                 }
@@ -145,18 +146,14 @@ instance.on('command::SpeedUpCommand', ({ command, client }) => {
 });
 
 const updateLeaderboard = (client) => {
-    const leaderboardData = Array.from(scores.entries())
-        .map(([clientID, score]) => ({ clientID, score }))
-        .sort((a, b) => b.score - a.score);
+    const leaderboardArray = Array.from(scores, ([clientID, score]) => ({ clientID, score }));
 
-    //console.log("LeaderboardData: ", leaderboardData)
-    const leaderboardMessage = new LeaderboardUpdate(leaderboardData);
-    //console.log(leaderboardMessage);
+    leaderboardArray.sort((a, b) => b.score - a.score);
     
-    //console.log("Instance: ", instance.clients)
-    //console.log("Client: ", client)
+    leaderboardArray.forEach(({ clientID, score }) => {
+        instance.message(new LeaderboardUpdate(clientID, score), client);
+    });
     
-    instance.message(leaderboardMessage, client);
 };
 
 const updatePlayerScore = (clientID, newScore, client) => {

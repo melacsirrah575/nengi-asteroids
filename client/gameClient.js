@@ -31,7 +31,8 @@ client.on('message::Identity', message => {
     state.myId = message.entityId
 })
 
-client.on('message::leaderboardUpdate', message => {
+client.on('message::LeaderboardUpdate', message => {
+    console.log("Received leaderboardMessage!")
     state.leaderboard = message.data;
     updateLeaderboardUI();
 });
@@ -39,7 +40,16 @@ client.on('message::leaderboardUpdate', message => {
 client.connect('ws://localhost:8079')
 
 const updateLeaderboardUI = () => {
-    // logic to update the UI with state.leaderboard
+    console.log("state.leaderboard: ", state.leaderboard)
+    const leaderboardElement = document.getElementById('leaderboard');
+
+    leaderboardElement.innerHTML = '';
+
+    state.leaderboard.forEach((entry, index) => {
+        const playerEntry = document.createElement('div');
+        playerEntry.textContent = `#${index + 1}: Player ${entry.clientID} - Score: ${entry.score}`;
+        leaderboardElement.appendChild(playerEntry);
+    });
 };
 
 const update = (delta, tick, now) => {
