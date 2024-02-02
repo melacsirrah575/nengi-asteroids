@@ -57,10 +57,10 @@ client.connect('ws://localhost:8079')
 const updateLeaderboardUI = () => {
     console.log("state.leaderboard: ", state.leaderboard);
     const leaderboardElement = document.getElementById('leaderboard');
+    console.log("leaderboardElement: ", leaderboardElement)
 
     leaderboardElement.innerHTML = '';
 
-    // Convert Map entries to an array and sort it based on the score in descending order
     const sortedEntries = [...state.leaderboard.entries()].sort((a, b) => b[1].score - a[1].score);
 
     let index = 1;

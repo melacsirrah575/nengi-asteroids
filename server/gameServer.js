@@ -114,7 +114,7 @@ instance.on('command::PlayerInput', ({ command, client }) => {
                 const newScore = client.entity.score
 
                 updatePlayerScore(client.entity.nid, newScore, client);
-              
+            
                 if (client.entity.health <= 0) {
                     client.entity.isDead = true
                     console.log("Player: ", client.entity.nid, " should be ded");
