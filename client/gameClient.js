@@ -6,13 +6,15 @@ import renderer from './graphics/renderer.js'
 import { frameState, releaseKeys, currentState } from './input.js'
 import PlayerInput from '../common/PlayerInput.js'
 import SpeedUpCommand from '../common/SpeedUpCommand.js'
+import PlayerDeathMessage from '../common/PlayerDeathMessage.js'
 
 const client = new nengi.Client(nengiConfig, 100)
 
 const state = {
     /* clientside state can go here */
     myId: null,
-    myEntity: null
+    myEntity: null,
+    leaderboard: new Map()
 }
 
 /* create hooks for any entity create, delete, and watch properties */
@@ -23,14 +25,54 @@ client.on('disconnected', () => { console.log('connection closed') })
 
 /* on('message::AnyMessage', msg => { }) */
 client.on('message::NetLog', message => {
-    console.log(`NetLog: ${ message.text }`)
 })
 
 client.on('message::Identity', message => {
     state.myId = message.entityId
 })
 
+client.on('message::PlayerDeathMessage', message => {
+    console.log("Death Message recieved!")
+    const deathMessageElement = document.getElementById('death-message');
+    deathMessageElement.innerText = message.text;
+
+    const deathMessageContainer = document.getElementById('death-message-container');
+    deathMessageContainer.style.display = 'block';
+});
+
+client.on('message::LeaderboardUpdate', message => {
+    if (message.clientUsername === "") return;
+    if (state.leaderboard.has(message.clientUsername)) {
+        state.leaderboard.set(message.clientUsername, { score: message.score });
+    } else {
+        state.leaderboard.set(message.clientUsername, { score: message.score });
+    }
+
+    console.log("Leaderboard: ", state.leaderboard);
+
+    updateLeaderboardUI();
+});
+
 client.connect('ws://localhost:8079')
+
+const updateLeaderboardUI = () => {
+    console.log("state.leaderboard: ", state.leaderboard);
+    const leaderboardElement = document.getElementById('leaderboard');
+    console.log("leaderboardElement: ", leaderboardElement)
+
+    leaderboardElement.innerHTML = '';
+
+    const sortedEntries = [...state.leaderboard.entries()].sort((a, b) => b[1].score - a[1].score);
+
+    let index = 1;
+    for (const [clientUsername, entry] of sortedEntries) {
+        const playerEntry = document.createElement('div');
+        playerEntry.textContent = `#${index}: ${clientUsername} - Score: ${entry.score}`;
+        leaderboardElement.appendChild(playerEntry);
+        index++;
+    }
+};
+
 
 const update = (delta, tick, now) => {
     client.readNetworkAndEmit()
