@@ -7,6 +7,8 @@ import Identity from '../common/Identity.js'
 import asteroidSystem from './asteroidSystem.js'
 import SpeedUpCommand from '../common/SpeedUpCommand.js'
 import Projectile from '../common/Projectile.js'
+import PlayerDeathMessage from '../common/PlayerDeathMessage.js'
+import LeaderboardUpdate from '../common/LeaderboardUpdate.js'
 
 const usernamePool = ['Player1', 'Player2', 'Player3', 'Player4', 'Player5'];
 
@@ -30,6 +32,8 @@ instanceHookAPI(instance)
 /* serverside state here */
 const entities = new Map()
 const projectiles = new Map()
+const scores = new Map()
+
 asteroidSystem.populate(instance, 10)
 
 instance.on('connect', ({ client, callback }) => {
@@ -41,6 +45,9 @@ instance.on('connect', ({ client, callback }) => {
     instance.message(new Identity(entity.nid), client)
     entities.set(entity.nid, entity)
     client.entity = entity
+    if (!scores.has(entity.nid)) {
+        scores.set(entity.nid, entity.score)
+    }
     client.view = {
         x: entity.x,
         y: entity.y,
@@ -53,12 +60,19 @@ instance.on('connect', ({ client, callback }) => {
 })
 
 instance.on('disconnect', client => {
+    scores.delete(client.entity.nid);
+    updateLeaderboard();
     entities.delete(client.entity.nid)
     instance.removeEntity(client.entity)
 })
 
 /* on('command::AnyCommand', ({ command, client }) => { }) */
 instance.on('command::PlayerInput', ({ command, client }) => {
+    if (client.entity.isDead) {
+        console.log("SendingDeathMessage")
+        instance.message(new PlayerDeathMessage(client.entity.nid), client);
+        return
+    }
     const { up, down, left, right, rotation, delta, fire } = command
     const { entity } = client
     const speed = 200 * client.entity.speedMultiplier
@@ -84,51 +98,72 @@ instance.on('command::PlayerInput', ({ command, client }) => {
         instance.addEntity(projectile)
         projectiles.set(projectile.nid, projectile)
         client.projectile = projectile
-        console.log("Projectile OwnerID: ", projectile.ownerID)
     }
-
-    //Collision Checks
-    instance.clients.forEach(otherClient => {
-        if (otherClient !== client) {
-            //Client - Client collision
-            const otherEntity = otherClient.entity;
-            if (checkCollision(entity, otherEntity)) {
-                console.log(`Collision between ${client.entity.nid} and ${otherClient.entity.nid}`);
-                // Handle collision logic here
-            }
-        }
-    })
 
     projectiles.forEach(projectile => {
         if (projectile.ownerID !== client.entity.nid) {
             if (checkCollision(client.entity, projectile)) {
-                console.log(`Collision between ${projectile.nid} and ${entity.nid}`);
                 client.entity.health -= 1
+
+                instance.clients.forEach(clientToGainScore => {
+                    if (clientToGainScore.entity.nid === projectile.ownerID) {
+                        clientToGainScore.entity.score += 10;
+                        updatePlayerScore(clientToGainScore.entity.nid, clientToGainScore.entity.score);
+                    }
+
+                    if (client.entity.health <= 0) {
+                        clientToGainScore.entity.score += 20
+                        updatePlayerScore(clientToGainScore.entity.nid, clientToGainScore.entity.score);
+
+                        client.entity.isDead = true
+                        
+                        if (entities.has(client.entity.nid)) {
+                            entities.delete(client.entity.nid);
+                            instance.removeEntity(client.entity);
+                        }
+                    }
+                })
+
                 projectiles.delete(projectile.nid)
                 instance.removeEntity(projectile)
-
-                console.log(client.entity.nid, " HP = ", client.entity.health)
-
-                if (client.entity.health <= 0) {
-                    console.log("Player: ", client.entity.nid, " should be ded")
-                    instance.message(new NetLog("You died"), client)
-                }
             }
         }
 
-        asteroidSystem.asteroids.forEach(asteroid => {
+        Array.from(asteroidSystem.asteroids.values()).forEach(asteroid => {
             if (checkCollision(projectile, asteroid)) {
-                console.log(`Collision between ${projectile.nid} and ${asteroid.nid}`);
-                //DESTROY ASTEROID AND GIVE PLAYER SCORE
+        
+                instance.clients.forEach(clientToGainScore => {
+                    if (clientToGainScore.entity.nid === projectile.ownerID) {
+                        if (!asteroid.isSmallAsteroid) {
+                            clientToGainScore.entity.score += 5
+                        } else {
+                            clientToGainScore.entity.score += 10
+                        }
+
+                        updatePlayerScore(clientToGainScore.entity.nid, clientToGainScore.entity.score);
+                    }
+                })
+
+                if (!asteroid.isSmallAsteroid) {
+                    const spawnPosX = asteroid.x;
+                    const spawnPosY = asteroid.y;
+
+                    asteroidSystem.populateAsteroidsFromDestroyedAsteroid(instance, 4, spawnPosX, spawnPosY, 0.5);
+                }
+        
+                asteroidSystem.asteroids.delete(asteroid.nid);
+                instance.removeEntity(asteroid);
+                projectiles.delete(projectile.nid);
+                instance.removeEntity(projectile);
             }
-        })
+        });
     })
 
     asteroidSystem.asteroids.forEach(asteroid => {
-        if (checkCollision(client.entity, asteroid)) {
-            console.log(`Collision between ${client.entity.nid} and ${asteroid.nid}`);
-            //DESTROY ASTEROID, REMOVE 1 LIFE FROM PLAYER, AND REDUCE SCORE
-        }
+            if (checkCollision(client.entity, asteroid)) {
+                console.log(`Collision between ${client.entity.nid} and ${asteroid.nid}`);
+                //DESTROY ASTEROID, REMOVE 1 LIFE FROM PLAYER, AND REDUCE SCORE
+            }
     })
 })
 
@@ -143,6 +178,24 @@ instance.on('command::SpeedUpCommand', ({ command, client }) => {
     }
 });
 
+const updateLeaderboard = () => {
+    const leaderboardArray = Array.from(scores, ([clientID, score]) => ({ clientID, score }));
+
+    leaderboardArray.sort((a, b) => b.score - a.score);
+    
+    instance.clients.forEach(client => {
+        console.log("ClientID: ", client.entity.nid)
+        leaderboardArray.forEach(({ clientID, score }) => {
+            instance.message(new LeaderboardUpdate(clientID, score), client);
+        });
+    })
+    
+};
+
+const updatePlayerScore = (clientID, newScore) => {
+    scores.set(clientID, newScore);
+    updateLeaderboard();
+};
 
 const updateTimers = (delta) => {
     instance.clients.forEach(client => {

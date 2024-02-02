@@ -10,3 +10,44 @@ html, body {
     width: 100%;
     height: 100%;
 }
+
+#death-message-container {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+#death-message {
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+}
+
+#reload-button {
+    margin-top: 10px;
+    background-color: #3498db;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+#reload-button:hover {
+    background-color: #2980b9;
+}
+
+#leaderboard {
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+}
