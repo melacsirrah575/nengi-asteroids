@@ -150,9 +150,12 @@ const updateLeaderboard = (client) => {
 
     leaderboardArray.sort((a, b) => b.score - a.score);
     
-    leaderboardArray.forEach(({ clientID, score }) => {
-        instance.message(new LeaderboardUpdate(clientID, score), client);
-    });
+    instance.clients.forEach(client => {
+        console.log("ClientID: ", client.entity.nid)
+        leaderboardArray.forEach(({ clientID, score }) => {
+            instance.message(new LeaderboardUpdate(clientID, score), client);
+        });
+    })
     
 };
 
