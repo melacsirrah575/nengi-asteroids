@@ -129,12 +129,23 @@ instance.on('command::PlayerInput', ({ command, client }) => {
             }
         }
 
-        asteroidSystem.asteroids.forEach(asteroid => {
+        Array.from(asteroidSystem.asteroids.values()).forEach(asteroid => {
             if (checkCollision(projectile, asteroid)) {
-                //console.log(`Collision between ${projectile.nid} and ${asteroid.nid}`);
-                //DESTROY ASTEROID AND GIVE PLAYER SCORE
+                console.log(`Collision between ${projectile.nid} and ${asteroid.nid}`);
+        
+                const spawnPosX = asteroid.x;
+                const spawnPosY = asteroid.y;
+                
+                if (!asteroid.isSmallAsteroid) {
+                    asteroidSystem.populateAsteroidsFromDestroyedAsteroid(instance, 4, spawnPosX, spawnPosY, 0.5);
+                }
+        
+                asteroidSystem.asteroids.delete(asteroid.nid);
+                instance.removeEntity(asteroid);
+                projectiles.delete(projectile.nid);
+                instance.removeEntity(projectile);
             }
-        })
+        });
     })
 
     asteroidSystem.asteroids.forEach(asteroid => {
