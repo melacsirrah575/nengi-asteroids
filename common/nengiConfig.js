@@ -6,6 +6,7 @@ import PlayerInput from './PlayerInput.js'
 import Identity from './Identity.js'
 import SpeedUpCommand from './SpeedUpCommand.js'
 import Projectile from './Projectile.js'
+import PlayerDeathMessage from './PlayerDeathMessage.js'
 import LeaderboardUpdate from './LeaderboardUpdate.js'
 
 const config = {
@@ -30,6 +31,7 @@ const config = {
         messages: [
             ['NetLog', NetLog],
             ['Identity', Identity],
+            ['PlayerDeathMessage', PlayerDeathMessage],
             ['LeaderboardUpdate', LeaderboardUpdate]
         ],
         commands: [

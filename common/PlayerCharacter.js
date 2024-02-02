@@ -27,6 +27,8 @@ class PlayerCharacter {
 
         this.projectileTimer = 0;
 
+        this.isDead = false;
+
         this.score = 0;
     }
 }
@@ -42,6 +44,7 @@ PlayerCharacter.protocol = {
     speedUpDurationTimer: { type: nengi.Number, interp: false },
     speedUpCooldownTimer: { type: nengi.Number, interp: false },
     projectileTimer: { type: nengi.Number, interp: false },
+    isDead: { type: nengi.Boolean },
     score: {type: nengi.Number, interp: false }
 };
 

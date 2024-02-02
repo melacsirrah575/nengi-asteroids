@@ -7,6 +7,7 @@ import Identity from '../common/Identity.js'
 import asteroidSystem from './asteroidSystem.js'
 import SpeedUpCommand from '../common/SpeedUpCommand.js'
 import Projectile from '../common/Projectile.js'
+import PlayerDeathMessage from '../common/PlayerDeathMessage.js'
 import LeaderboardUpdate from '../common/LeaderboardUpdate.js'
 
 const checkCollision = (entityA, entityB) => {
@@ -57,6 +58,11 @@ instance.on('disconnect', client => {
 
 /* on('command::AnyCommand', ({ command, client }) => { }) */
 instance.on('command::PlayerInput', ({ command, client }) => {
+    if (client.entity.isDead) {
+        console.log("SendingDeathMessage")
+        instance.message(new PlayerDeathMessage(client.entity.nid), client);
+        return
+    }
     const { up, down, left, right, rotation, delta, fire } = command
     const { entity } = client
     const speed = 200 * client.entity.speedMultiplier
@@ -82,7 +88,6 @@ instance.on('command::PlayerInput', ({ command, client }) => {
         instance.addEntity(projectile)
         projectiles.set(projectile.nid, projectile)
         client.projectile = projectile
-        console.log("Projectile OwnerID: ", projectile.ownerID)
     }
 
     //Collision Checks
@@ -91,7 +96,7 @@ instance.on('command::PlayerInput', ({ command, client }) => {
             //Client - Client collision
             const otherEntity = otherClient.entity;
             if (checkCollision(entity, otherEntity)) {
-                console.log(`Collision between ${client.entity.nid} and ${otherClient.entity.nid}`);
+                //console.log(`Collision between ${client.entity.nid} and ${otherClient.entity.nid}`);
                 // Handle collision logic here
             }
         }
@@ -100,7 +105,7 @@ instance.on('command::PlayerInput', ({ command, client }) => {
     projectiles.forEach(projectile => {
         if (projectile.ownerID !== client.entity.nid) {
             if (checkCollision(client.entity, projectile)) {
-                console.log(`Collision between ${projectile.nid} and ${entity.nid}`);
+                //console.log(`Collision between ${projectile.nid} and ${entity.nid}`);
                 client.entity.health -= 1
                 projectiles.delete(projectile.nid)
                 instance.removeEntity(projectile)
@@ -109,28 +114,34 @@ instance.on('command::PlayerInput', ({ command, client }) => {
                 const newScore = client.entity.score
 
                 updatePlayerScore(client.entity.nid, newScore, client);
-
+              
                 if (client.entity.health <= 0) {
-                    console.log("Player: ", client.entity.nid, " should be ded")
+                    client.entity.isDead = true
+                    console.log("Player: ", client.entity.nid, " should be ded");
+                    console.log("Entities size: ", entities.size)
+                    if (entities.has(client.entity.nid)) {
+                        instance.message(new NetLog("You died"), client);
 
-                    instance.message(new NetLog("You died"), client)
+                        entities.delete(client.entity.nid);
+                        instance.removeEntity(client.entity);
+                    }
                 }
             }
         }
 
         asteroidSystem.asteroids.forEach(asteroid => {
             if (checkCollision(projectile, asteroid)) {
-                console.log(`Collision between ${projectile.nid} and ${asteroid.nid}`);
+                //console.log(`Collision between ${projectile.nid} and ${asteroid.nid}`);
                 //DESTROY ASTEROID AND GIVE PLAYER SCORE
             }
         })
     })
 
     asteroidSystem.asteroids.forEach(asteroid => {
-        if (checkCollision(client.entity, asteroid)) {
-            console.log(`Collision between ${client.entity.nid} and ${asteroid.nid}`);
-            //DESTROY ASTEROID, REMOVE 1 LIFE FROM PLAYER, AND REDUCE SCORE
-        }
+            if (checkCollision(client.entity, asteroid)) {
+                console.log(`Collision between ${client.entity.nid} and ${asteroid.nid}`);
+                //DESTROY ASTEROID, REMOVE 1 LIFE FROM PLAYER, AND REDUCE SCORE
+            }
     })
 })
 
