@@ -1,14 +1,14 @@
 import nengi from 'nengi';
 
 class LeaderboardUpdate {
-    constructor(clientID, score) {
-        this.clientID = clientID;
+    constructor(clientUsername, score) {
+        this.clientUsername = clientUsername;
         this.score = score;
     }
 }
 
 LeaderboardUpdate.protocol = {
-    clientID: nengi.UInt16, 
+    clientUsername: nengi.String, 
     score: nengi.UInt16 
 };
 

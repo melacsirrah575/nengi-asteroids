@@ -41,10 +41,11 @@ client.on('message::PlayerDeathMessage', message => {
 });
 
 client.on('message::LeaderboardUpdate', message => {
-    if (state.leaderboard.has(message.clientID)) {
-        state.leaderboard.set(message.clientID, { score: message.score });
+    if (message.clientUsername === "") return;
+    if (state.leaderboard.has(message.clientUsername)) {
+        state.leaderboard.set(message.clientUsername, { score: message.score });
     } else {
-        state.leaderboard.set(message.clientID, { score: message.score });
+        state.leaderboard.set(message.clientUsername, { score: message.score });
     }
 
     console.log("Leaderboard: ", state.leaderboard);
@@ -64,9 +65,9 @@ const updateLeaderboardUI = () => {
     const sortedEntries = [...state.leaderboard.entries()].sort((a, b) => b[1].score - a[1].score);
 
     let index = 1;
-    for (const [clientID, entry] of sortedEntries) {
+    for (const [clientUsername, entry] of sortedEntries) {
         const playerEntry = document.createElement('div');
-        playerEntry.textContent = `#${index}: Player ${clientID} - Score: ${entry.score}`;
+        playerEntry.textContent = `#${index}: ${clientUsername} - Score: ${entry.score}`;
         leaderboardElement.appendChild(playerEntry);
         index++;
     }

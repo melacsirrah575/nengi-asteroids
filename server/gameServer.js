@@ -106,14 +106,15 @@ instance.on('command::PlayerInput', ({ command, client }) => {
                 client.entity.health -= 1
 
                 instance.clients.forEach(clientToGainScore => {
+                    if (clientToGainScore.entity.nid === client.entity.nid) return;
                     if (clientToGainScore.entity.nid === projectile.ownerID) {
                         clientToGainScore.entity.score += 10;
-                        updatePlayerScore(clientToGainScore.entity.nid, clientToGainScore.entity.score);
+                        updatePlayerScore(clientToGainScore.entity.username, clientToGainScore.entity.score);
                     }
 
                     if (client.entity.health <= 0) {
                         clientToGainScore.entity.score += 20
-                        updatePlayerScore(clientToGainScore.entity.nid, clientToGainScore.entity.score);
+                        updatePlayerScore(clientToGainScore.entity.username, clientToGainScore.entity.score);
 
                         client.entity.isDead = true
                         
@@ -140,7 +141,7 @@ instance.on('command::PlayerInput', ({ command, client }) => {
                             clientToGainScore.entity.score += 10
                         }
 
-                        updatePlayerScore(clientToGainScore.entity.nid, clientToGainScore.entity.score);
+                        updatePlayerScore(clientToGainScore.entity.username, clientToGainScore.entity.score);
                     }
                 })
 
@@ -179,21 +180,21 @@ instance.on('command::SpeedUpCommand', ({ command, client }) => {
 });
 
 const updateLeaderboard = () => {
-    const leaderboardArray = Array.from(scores, ([clientID, score]) => ({ clientID, score }));
+    const leaderboardArray = Array.from(scores, ([clientUsername, score]) => ({ clientUsername, score }));
 
     leaderboardArray.sort((a, b) => b.score - a.score);
     
     instance.clients.forEach(client => {
-        console.log("ClientID: ", client.entity.nid)
-        leaderboardArray.forEach(({ clientID, score }) => {
-            instance.message(new LeaderboardUpdate(clientID, score), client);
+        console.log("ClientUsername: ", client.entity.username)
+        leaderboardArray.forEach(({ clientUsername, score }) => {
+            instance.message(new LeaderboardUpdate(clientUsername, score), client);
         });
     })
     
 };
 
-const updatePlayerScore = (clientID, newScore) => {
-    scores.set(clientID, newScore);
+const updatePlayerScore = (clientUsername, newScore) => {
+    scores.set(clientUsername, newScore);
     updateLeaderboard();
 };
 
