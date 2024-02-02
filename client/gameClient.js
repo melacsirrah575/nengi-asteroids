@@ -13,7 +13,8 @@ const client = new nengi.Client(nengiConfig, 100)
 const state = {
     /* clientside state can go here */
     myId: null,
-    myEntity: null
+    myEntity: null,
+    leaderboard: new Map()
 }
 
 /* create hooks for any entity create, delete, and watch properties */
@@ -39,7 +40,38 @@ client.on('message::PlayerDeathMessage', message => {
     deathMessageContainer.style.display = 'block';
 });
 
+client.on('message::LeaderboardUpdate', message => {
+    if (state.leaderboard.has(message.clientID)) {
+        state.leaderboard.set(message.clientID, { score: message.score });
+    } else {
+        state.leaderboard.set(message.clientID, { score: message.score });
+    }
+
+    console.log("Leaderboard: ", state.leaderboard);
+
+    updateLeaderboardUI();
+});
+
 client.connect('ws://localhost:8079')
+
+const updateLeaderboardUI = () => {
+    console.log("state.leaderboard: ", state.leaderboard);
+    const leaderboardElement = document.getElementById('leaderboard');
+
+    leaderboardElement.innerHTML = '';
+
+    // Convert Map entries to an array and sort it based on the score in descending order
+    const sortedEntries = [...state.leaderboard.entries()].sort((a, b) => b[1].score - a[1].score);
+
+    let index = 1;
+    for (const [clientID, entry] of sortedEntries) {
+        const playerEntry = document.createElement('div');
+        playerEntry.textContent = `#${index}: Player ${clientID} - Score: ${entry.score}`;
+        leaderboardElement.appendChild(playerEntry);
+        index++;
+    }
+};
+
 
 const update = (delta, tick, now) => {
     client.readNetworkAndEmit()

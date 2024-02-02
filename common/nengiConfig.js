@@ -7,6 +7,7 @@ import Identity from './Identity.js'
 import SpeedUpCommand from './SpeedUpCommand.js'
 import Projectile from './Projectile.js'
 import PlayerDeathMessage from './PlayerDeathMessage.js'
+import LeaderboardUpdate from './LeaderboardUpdate.js'
 
 const config = {
     UPDATE_RATE: 20, 
@@ -30,7 +31,8 @@ const config = {
         messages: [
             ['NetLog', NetLog],
             ['Identity', Identity],
-            ['PlayerDeathMessage', PlayerDeathMessage]
+            ['PlayerDeathMessage', PlayerDeathMessage],
+            ['LeaderboardUpdate', LeaderboardUpdate]
         ],
         commands: [
             ['PlayerInput', PlayerInput],
