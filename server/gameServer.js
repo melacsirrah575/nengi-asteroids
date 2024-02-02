@@ -10,6 +10,13 @@ import Projectile from '../common/Projectile.js'
 import PlayerDeathMessage from '../common/PlayerDeathMessage.js'
 import LeaderboardUpdate from '../common/LeaderboardUpdate.js'
 
+const usernamePool = ['Player1', 'Player2', 'Player3', 'Player4', 'Player5'];
+
+function getRandomUsername() {
+    const randomIndex = Math.floor(Math.random() * usernamePool.length);
+    return usernamePool[randomIndex];
+}
+
 const checkCollision = (entityA, entityB) => {
     return (
         entityA.x < entityB.x + entityB.width &&
@@ -47,6 +54,9 @@ instance.on('connect', ({ client, callback }) => {
         halfWidth: 500,
         halfHeight: 500
     }
+
+    entity.username = getRandomUsername()
+    console.log("entity.username: ", entity.username)
 })
 
 instance.on('disconnect', client => {

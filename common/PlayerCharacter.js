@@ -2,6 +2,7 @@ import nengi from 'nengi'
 
 class PlayerCharacter {
     constructor() {
+        this.username = "Test"
         this.x = 50;
         this.y = 50;
         this.health = 3;
@@ -45,7 +46,8 @@ PlayerCharacter.protocol = {
     speedUpCooldownTimer: { type: nengi.Number, interp: false },
     projectileTimer: { type: nengi.Number, interp: false },
     isDead: { type: nengi.Boolean },
-    score: {type: nengi.Number, interp: false }
+    score: {type: nengi.Number, interp: false },
+    username: { type: nengi.String }
 };
 
 export default PlayerCharacter;
