@@ -51,7 +51,7 @@ instance.on('connect', ({ client, callback }) => {
 
 instance.on('disconnect', client => {
     scores.delete(client.entity.nid);
-    updateLeaderboard(client);
+    updateLeaderboard();
     entities.delete(client.entity.nid)
     instance.removeEntity(client.entity)
 })
@@ -90,53 +90,54 @@ instance.on('command::PlayerInput', ({ command, client }) => {
         client.projectile = projectile
     }
 
-    //Collision Checks
-    instance.clients.forEach(otherClient => {
-        if (otherClient !== client) {
-            //Client - Client collision
-            const otherEntity = otherClient.entity;
-            if (checkCollision(entity, otherEntity)) {
-                //console.log(`Collision between ${client.entity.nid} and ${otherClient.entity.nid}`);
-                // Handle collision logic here
-            }
-        }
-    })
-
     projectiles.forEach(projectile => {
         if (projectile.ownerID !== client.entity.nid) {
             if (checkCollision(client.entity, projectile)) {
-                //console.log(`Collision between ${projectile.nid} and ${entity.nid}`);
                 client.entity.health -= 1
+
+                instance.clients.forEach(clientToGainScore => {
+                    if (clientToGainScore.entity.nid === projectile.ownerID) {
+                        clientToGainScore.entity.score += 10;
+                        updatePlayerScore(clientToGainScore.entity.nid, clientToGainScore.entity.score);
+                    }
+
+                    if (client.entity.health <= 0) {
+                        clientToGainScore.entity.score += 20
+                        updatePlayerScore(clientToGainScore.entity.nid, clientToGainScore.entity.score);
+
+                        client.entity.isDead = true
+                        
+                        if (entities.has(client.entity.nid)) {
+                            entities.delete(client.entity.nid);
+                            instance.removeEntity(client.entity);
+                        }
+                    }
+                })
+
                 projectiles.delete(projectile.nid)
                 instance.removeEntity(projectile)
-
-                client.entity.score += 10;
-                const newScore = client.entity.score
-
-                updatePlayerScore(client.entity.nid, newScore, client);
-            
-                if (client.entity.health <= 0) {
-                    client.entity.isDead = true
-                    console.log("Player: ", client.entity.nid, " should be ded");
-                    console.log("Entities size: ", entities.size)
-                    if (entities.has(client.entity.nid)) {
-                        instance.message(new NetLog("You died"), client);
-
-                        entities.delete(client.entity.nid);
-                        instance.removeEntity(client.entity);
-                    }
-                }
             }
         }
 
         Array.from(asteroidSystem.asteroids.values()).forEach(asteroid => {
             if (checkCollision(projectile, asteroid)) {
-                console.log(`Collision between ${projectile.nid} and ${asteroid.nid}`);
         
-                const spawnPosX = asteroid.x;
-                const spawnPosY = asteroid.y;
-                
+                instance.clients.forEach(clientToGainScore => {
+                    if (clientToGainScore.entity.nid === projectile.ownerID) {
+                        if (!asteroid.isSmallAsteroid) {
+                            clientToGainScore.entity.score += 5
+                        } else {
+                            clientToGainScore.entity.score += 10
+                        }
+
+                        updatePlayerScore(clientToGainScore.entity.nid, clientToGainScore.entity.score);
+                    }
+                })
+
                 if (!asteroid.isSmallAsteroid) {
+                    const spawnPosX = asteroid.x;
+                    const spawnPosY = asteroid.y;
+
                     asteroidSystem.populateAsteroidsFromDestroyedAsteroid(instance, 4, spawnPosX, spawnPosY, 0.5);
                 }
         
@@ -167,7 +168,7 @@ instance.on('command::SpeedUpCommand', ({ command, client }) => {
     }
 });
 
-const updateLeaderboard = (client) => {
+const updateLeaderboard = () => {
     const leaderboardArray = Array.from(scores, ([clientID, score]) => ({ clientID, score }));
 
     leaderboardArray.sort((a, b) => b.score - a.score);
@@ -181,9 +182,9 @@ const updateLeaderboard = (client) => {
     
 };
 
-const updatePlayerScore = (clientID, newScore, client) => {
+const updatePlayerScore = (clientID, newScore) => {
     scores.set(clientID, newScore);
-    updateLeaderboard(client);
+    updateLeaderboard();
 };
 
 const updateTimers = (delta) => {
